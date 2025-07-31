@@ -9,11 +9,8 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Guide_services
         public async Task<Resource> GetByIdAsync(Guid entityId)
             => await context.Resources.SingleAsync(x => x.Id == entityId);
 
-        public async Task<List<Resource>> GetAllArchivedAsync()
-            => await context.Resources.Where(x => x.IsArchived).ToListAsync();
-
-        public async Task<List<Resource>> GetAllUnarchivedAsync()
-            => await context.Resources.Where(x => !x.IsArchived).ToListAsync();
+        public async Task<List<Resource>> GetAllAsync(bool isArchived)
+            => await context.Resources.Where(x => x.IsArchived == isArchived).ToListAsync();
 
         public async Task UpdateAsync(Resource model)
         {

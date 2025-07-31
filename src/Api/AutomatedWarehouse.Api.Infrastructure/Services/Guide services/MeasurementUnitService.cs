@@ -9,11 +9,8 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Guide_services
         public async Task<MeasurementUnit> GetByIdAsync(Guid entityId)
             => await context.MeasurementUnits.SingleAsync(x => x.Id == entityId);
 
-        public async Task<List<MeasurementUnit>> GetAllArchivedAsync()
-            => await context.MeasurementUnits.Where(x => x.IsArchived).ToListAsync();
-
-        public async Task<List<MeasurementUnit>> GetAllUnarchivedAsync()
-            => await context.MeasurementUnits.Where(x => !x.IsArchived).ToListAsync();
+        public async Task<List<MeasurementUnit>> GetAllAsync(bool isArchived)
+            => await context.MeasurementUnits.Where(x => x.IsArchived == isArchived).ToListAsync();
 
         public async Task UpdateAsync(MeasurementUnit model)
         {
