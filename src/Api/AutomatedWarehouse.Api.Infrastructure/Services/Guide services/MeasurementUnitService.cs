@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AutomatedWarehouse.Api.Infrastructure.Services.Guide_services
 {
-    public class MeasurementService(ApplicationDbContext context) : IGuideService<MeasurementUnit>
+    public class MeasurementUnitService(ApplicationDbContext context) : IGuideService<MeasurementUnit>
     {
         public async Task<MeasurementUnit> GetByIdAsync(Guid entityId)
             => await context.MeasurementUnits.SingleAsync(x => x.Id == entityId);

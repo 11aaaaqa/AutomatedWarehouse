@@ -11,7 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(x
     => x.UseNpgsql(builder.Configuration["Database:ConnectionString"]));
 
 builder.Services.AddTransient<IGuideService<Resource>, ResourceService>();
-builder.Services.AddTransient<IGuideService<MeasurementUnit>, MeasurementService>();
+builder.Services.AddTransient<IGuideService<MeasurementUnit>, MeasurementUnitService>();
 builder.Services.AddTransient<IReceiptResourceService, ReceiptResourceService>();
 builder.Services.AddTransient<IReceiptDocumentService, ReceiptDocumentService>();
 
