@@ -2,6 +2,7 @@
 using AutomatedWarehouse.Api.DTOs.Measurement_unit;
 using AutomatedWarehouse.Api.Infrastructure.Services.Guide_services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutomatedWarehouse.Api.Controllers
 {
@@ -27,7 +28,7 @@ namespace AutomatedWarehouse.Api.Controllers
             {
                 await measurementUnitService.DeleteAsync(measurementUnitId);
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Measurement unit cannot be deleted because it is used in another table");
             }
@@ -43,7 +44,7 @@ namespace AutomatedWarehouse.Api.Controllers
                 await measurementUnitService.CreateAsync(new MeasurementUnit
                     { Id = Guid.NewGuid(), Name = model.Name });
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Measurement unit with current name already exists");
             }
@@ -51,18 +52,33 @@ namespace AutomatedWarehouse.Api.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        [Route("Update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] MeasurementUnit model)
+        [HttpGet]
+        [Route("UpdateName/{measurementUnitId}")]
+        public async Task<IActionResult> UpdateNameAsync(Guid measurementUnitId, string newName)
         {
+            var measurementUnit = await measurementUnitService.GetByIdAsync(measurementUnitId);
+            measurementUnit.Name = newName;
+
             try
             {
-                await measurementUnitService.UpdateAsync(model);
+                await measurementUnitService.UpdateAsync(measurementUnit);
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Measurement unit with current name already exists");
             }
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("SetIsArchived/{measurementUnitId}")]
+        public async Task<IActionResult> SetIsArchivedAsync(Guid measurementUnitId, bool isArchived)
+        {
+            var measurementUnit = await measurementUnitService.GetByIdAsync(measurementUnitId);
+            measurementUnit.IsArchived = isArchived;
+
+            await measurementUnitService.UpdateAsync(measurementUnit);
 
             return Ok();
         }
