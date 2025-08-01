@@ -1,0 +1,37 @@
+services:
+  automated-warehouse-mvc:
+    image: ${DOCKER_REGISTRY-}automated-warehouse-mvc
+    build:
+      context: .
+      dockerfile: src/MVC/AutomatedWarehouse.MVC/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 23712:8080
+
+  automated-warehouse-api:
+    image: ${DOCKER_REGISTRY-}automated-warehouse-api
+    build:
+      context: .
+      dockerfile: src/Api/AutomatedWarehouse.Api/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - 23713:8080
+    depends_on:
+      - automated-warehouse-mvc
+
+  postgres-automated-warehouse:
+    container_name: postgres-automated-warehouse
+    image: postgres:latest
+    expose:
+      - 5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: AutomatedWarehouse
+    volumes: 
+      - postgres-automated-warehouse-data:/var/lib/postgresql/data
+  
+volumes:
+  postgres-automated-warehouse-data: {}
