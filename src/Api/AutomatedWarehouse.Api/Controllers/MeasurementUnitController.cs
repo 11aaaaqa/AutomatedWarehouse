@@ -16,7 +16,7 @@ namespace AutomatedWarehouse.Api.Controllers
 
         [HttpGet]
         [Route("GetAll")]
-        public async Task<IActionResult> GetAllArchivedAsync(bool isArchived)
+        public async Task<IActionResult> GetAllAsync(bool isArchived)
             => Ok(await measurementUnitService.GetAllAsync(isArchived));
 
         [HttpDelete]
