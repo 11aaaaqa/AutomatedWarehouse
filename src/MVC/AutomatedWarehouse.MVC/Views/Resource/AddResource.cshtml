@@ -1,0 +1,37 @@
+﻿<link rel="stylesheet" href="~/css/general-styles.css" />
+
+<div style="margin-bottom: 20px;">
+    <h2>Ресурсы</h2>
+    <button id="add-resource-btn" class="button green-button">Сохранить</button>
+</div>
+<div id="error-block" class="error-block"></div>
+
+<label for="add-resource-input">Наименование</label>
+<input type="text" id="add-resource-input" class="input" maxlength="200">
+
+<script src="~/js/show-error-message.js"></script>
+<script>
+    document.getElementById('add-resource-btn').addEventListener('click', async function() {
+        let resourceName = document.getElementById('add-resource-input').value.trim();
+        if (resourceName.length > 0) {
+            const response = await fetch(`/resources/add?resourceName=${resourceName}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json'
+                    }
+                });
+            if (response.status === 409) {
+                showErrorMessage(await response.text());
+            }
+            if(response.status === 500) {
+                showErrorMessage('Что-то пошло не так, попробуйте позже');
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        } else {
+            showErrorMessage('Наименование не может быть пустым');
+        }
+    });
+</script>

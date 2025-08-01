@@ -1,0 +1,80 @@
+﻿@model AutomatedWarehouse.MVC.Response_models.Resource.ResourceResponseModel
+<link rel="stylesheet" href="~/css/general-styles.css" />
+
+<div style="margin-bottom: 35px;">
+    <h2 style="margin-bottom: 15px;">Ресурс</h2>
+
+    <div style="display: flex;">
+        <button id="save-btn" class="button green-button" style="margin-right: 3px;">Сохранить</button>
+        <button id="delete-btn" class="button red-button" style="margin-right: 3px;">Удалить</button>
+        @if (Model.IsArchived)
+        {
+            <form method="post" asp-controller="Resource" asp-action="SetIsArchived"
+                  asp-route-resourceId="@Model.Id" asp-route-isArchived="false">
+                <input type="submit" value="В работу" class="button blue-button" />
+            </form>
+        }
+        else
+        {
+            <form method="post" asp-controller="Resource" asp-action="SetIsArchived"
+                  asp-route-resourceId="@Model.Id" asp-route-isArchived="true">
+                <input type="submit" value="В архив" class="button orange-button" />
+            </form>
+        }
+    </div>
+</div>
+
+<div id="error-block" class="error-block"></div>
+
+<input id="resource-id-hidden-input" type="hidden" asp-for="Id" />
+<label for="update-resource-input">Наименование</label>
+<input type="text" id="update-resource-input" value="@Model.Name" class="input" maxlength="200"/>
+
+<script src="~/js/show-error-message.js"></script>
+
+<script>
+    const resourceId = document.getElementById('resource-id-hidden-input').value;
+
+    document.getElementById('delete-btn').addEventListener('click', async function() {
+        const response = await fetch(`/resources/${resourceId}/delete`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        if (response.status === 409) {
+            showErrorMessage(await response.text());
+        }
+        if(response.status === 500) {
+            showErrorMessage('Что-то пошло не так, попробуйте позже');
+        }
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+    });
+
+    document.getElementById('save-btn').addEventListener('click', async function() {
+        let resourceName = document.getElementById('update-resource-input').value;
+        if (resourceName.trim().length > 0) {
+            const response = await fetch(`/resources/${resourceId}/update?newName=${resourceName}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+            if (response.status === 409) {
+                showErrorMessage(await response.text());
+            }
+            if(response.status === 500) {
+                showErrorMessage('Что-то пошло не так, попробуйте позже');
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        } else {
+            showErrorMessage('Наименование не может быть пустым');
+        }
+    });
+</script>
