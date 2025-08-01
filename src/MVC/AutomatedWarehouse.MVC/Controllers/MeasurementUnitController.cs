@@ -32,7 +32,7 @@ namespace AutomatedWarehouse.MVC.Controllers
 
         [HttpGet]
         [Route("measurement-units/add")]
-        public async Task<IActionResult> AddMeasurementUnit()
+        public IActionResult AddMeasurementUnit()
         {
             return View();
         }
@@ -50,7 +50,7 @@ namespace AutomatedWarehouse.MVC.Controllers
             var addMeasurementUnitResponse = await httpClient.PostAsync($"{url}/api/MeasurementUnit/Create", jsonContent);
             if (addMeasurementUnitResponse.StatusCode == HttpStatusCode.Conflict)
             {
-                return Conflict("Единица измерения с таким наименованиием уже существует");
+                return Conflict("В системе уже зарегистрирована единица измерения с таким наименованием");
             }
 
             addMeasurementUnitResponse.EnsureSuccessStatusCode();
@@ -98,7 +98,7 @@ namespace AutomatedWarehouse.MVC.Controllers
                 $"{url}/api/MeasurementUnit/UpdateName/{measurementUnitId}?newName={newName}");
             if (updateNameResponse.StatusCode == HttpStatusCode.Conflict)
             {
-                return Conflict("Единица измерения с таким наименованием уже существует");
+                return Conflict("В системе уже зарегистрирована единица измерения с таким наименованием");
             }
 
             updateNameResponse.EnsureSuccessStatusCode();
