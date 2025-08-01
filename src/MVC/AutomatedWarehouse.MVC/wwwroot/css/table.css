@@ -9,6 +9,8 @@ th {
 
 td {
     padding: 3px;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .table-link {
