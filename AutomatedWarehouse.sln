@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomatedWarehouse.Api.Doma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomatedWarehouse.Api.Infrastructure", "src\Api\AutomatedWarehouse.Api.Infrastructure\AutomatedWarehouse.Api.Infrastructure.csproj", "{BCD10AC0-C0CB-4A16-ABF7-B741688D51D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MVC", "MVC", "{B096C9F3-CC87-4CE6-A106-EFE2F2A07B57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomatedWarehouse.MVC", "src\MVC\AutomatedWarehouse.MVC\AutomatedWarehouse.MVC.csproj", "{FED694A3-064B-4BDF-ADA6-EE6329A5E47F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,10 @@ Global
 		{BCD10AC0-C0CB-4A16-ABF7-B741688D51D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCD10AC0-C0CB-4A16-ABF7-B741688D51D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCD10AC0-C0CB-4A16-ABF7-B741688D51D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED694A3-064B-4BDF-ADA6-EE6329A5E47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED694A3-064B-4BDF-ADA6-EE6329A5E47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED694A3-064B-4BDF-ADA6-EE6329A5E47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED694A3-064B-4BDF-ADA6-EE6329A5E47F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -40,5 +48,7 @@ Global
 		{B2BA454F-F806-43C2-A7C1-83492F333750} = {BFEA2AB8-6F1A-4A70-A06D-EAA3B7AF40D2}
 		{98A46318-812E-4931-999F-A7D0BC1FE1A3} = {BFEA2AB8-6F1A-4A70-A06D-EAA3B7AF40D2}
 		{BCD10AC0-C0CB-4A16-ABF7-B741688D51D6} = {BFEA2AB8-6F1A-4A70-A06D-EAA3B7AF40D2}
+		{B096C9F3-CC87-4CE6-A106-EFE2F2A07B57} = {A05C09AB-35CD-4B16-A156-87A7F1EC497E}
+		{FED694A3-064B-4BDF-ADA6-EE6329A5E47F} = {B096C9F3-CC87-4CE6-A106-EFE2F2A07B57}
 	EndGlobalSection
 EndGlobal
