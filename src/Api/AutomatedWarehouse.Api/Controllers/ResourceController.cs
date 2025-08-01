@@ -2,6 +2,7 @@
 using AutomatedWarehouse.Api.DTOs.Resource;
 using AutomatedWarehouse.Api.Infrastructure.Services.Guide_services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutomatedWarehouse.Api.Controllers
 {
@@ -27,7 +28,7 @@ namespace AutomatedWarehouse.Api.Controllers
             {
                 await resourceService.DeleteAsync(resourceId);
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Resource cannot be deleted because it is used in another table");
             }
@@ -43,7 +44,7 @@ namespace AutomatedWarehouse.Api.Controllers
                 await resourceService.CreateAsync(new Resource
                     { Id = Guid.NewGuid(), Name = model.Name });
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Resource with current name already exists");
             }
@@ -51,18 +52,33 @@ namespace AutomatedWarehouse.Api.Controllers
             return Ok();
         }
 
-        [HttpPut]
-        [Route("Update")]
-        public async Task<IActionResult> UpdateAsync([FromBody] Resource model)
+        [HttpGet]
+        [Route("UpdateName/{resourceId}")]
+        public async Task<IActionResult> UpdateNameAsync(Guid resourceId, string newName)
         {
+            var resource = await resourceService.GetByIdAsync(resourceId);
+            resource.Name = newName;
+
             try
             {
-                await resourceService.UpdateAsync(model);
+                await resourceService.UpdateAsync(resource);
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Resource with current name already exists");
             }
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("SetIsArchived/{resourceId}")]
+        public async Task<IActionResult> SetIsArchivedAsync(Guid resourceId, bool isArchived)
+        {
+            var resource = await resourceService.GetByIdAsync(resourceId);
+            resource.IsArchived = isArchived;
+
+            await resourceService.UpdateAsync(resource);
 
             return Ok();
         }
