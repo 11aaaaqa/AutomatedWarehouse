@@ -1,0 +1,38 @@
+﻿@model List<AutomatedWarehouse.MVC.Response_models.Resource.MeasurementUnitResponseModel>
+<link rel="stylesheet" href="~/css/general-styles.css"/>
+<link rel="stylesheet" href="~/css/table.css"/>
+
+<div style="margin-bottom: 35px;">
+    <h2 style="margin-bottom: 15px;">Ресурсы</h2>
+
+    @if (ViewBag.IsArchived == true)
+    {
+        <a class="button blue-button" asp-controller="MeasurementUnit" asp-action="GetMeasurementUnits" asp-route-isArchived="false">К рабочим</a>
+    }
+    else
+    {
+        <a class="button green-button" asp-controller="MeasurementUnit" asp-action="AddMeasurementUnit">Добавить</a>
+        <a class="button orange-button" asp-controller="MeasurementUnit" asp-action="GetMeasurementUnits" asp-route-isArchived="true">К архиву</a>
+    }
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th><strong>Наименование</strong></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var measurementUnit in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="MeasurementUnit" asp-action="GetMeasurementUnit" asp-route-measurementUnitId="@measurementUnit.Id"
+                       class="table-link">
+                        @measurementUnit.Name
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

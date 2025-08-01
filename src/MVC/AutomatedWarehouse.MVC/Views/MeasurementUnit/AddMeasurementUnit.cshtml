@@ -1,0 +1,38 @@
+﻿<link rel="stylesheet" href="~/css/general-styles.css"/>
+
+<div style="margin-bottom: 20px;">
+    <h2>Единицы измерения</h2>
+    <button id="add-unit-btn" class="button green-button">Сохранить</button>
+</div>
+<div id="error-block" class="error-block"></div>
+
+<label for="add-unit-input">Наименование</label>
+<input type="text" id="add-unit-input" class="input" maxlength="50">
+
+<script src="~/js/show-error-message.js"></script>
+<script>
+    const errorBlock = document.getElementById('error-block');
+    document.getElementById('add-unit-btn').addEventListener('click', async function() {
+        let unitName = document.getElementById('add-unit-input').value.trim();
+        if (unitName.length > 0) {
+            const response = await fetch(`/measurement-units/add?measurementUnitName=${unitName}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type':'application/json'
+                    }
+                });
+            if (response.status === 409) {
+                showErrorMessage(await response.text());
+            }
+            if(response.status === 500) {
+                showErrorMessage('Что-то пошло не так, попробуйте позже');
+            }
+            if (response.redirected) {
+                window.location.href = response.url;
+            }
+        } else {
+            showErrorMessage('Наименование не может быть пустым');
+        }
+    });
+</script>

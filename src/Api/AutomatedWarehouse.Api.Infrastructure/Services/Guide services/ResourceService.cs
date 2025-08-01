@@ -24,7 +24,7 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Guide_services
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid entityId)
+        public async Task DeleteAsync(Guid entityId) //check
         {
             var resource = await context.Resources.SingleAsync(x => x.Id == entityId);
             context.Resources.Remove(resource);
