@@ -7,9 +7,6 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Resour
 {
     public class ReceiptResourceService(ApplicationDbContext context) : IReceiptResourceService
     {
-        public async Task<List<ReceiptResource>> GetByReceiptDocumentIdAsync(Guid receiptDocumentId)
-            => await context.ReceiptResources.Where(x => x.ReceiptDocumentId == receiptDocumentId).ToListAsync();
-
         public async Task UpdateReceiptDocumentResourcesAsync(List<ReceiptResource> receiptResources, Guid receiptDocumentId)
         {
             if (receiptResources.Any(x => x.ReceiptDocumentId != receiptDocumentId))

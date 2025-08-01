@@ -6,6 +6,10 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
 {
     public class ReceiptDocumentService(ApplicationDbContext context) : IReceiptDocumentService
     {
+        public async Task<ReceiptDocument> GetByIdAsync(Guid receiptDocumentId)
+            => await context.ReceiptDocuments.Include(x => x.ReceiptResources)
+                .SingleAsync(x => x.Id == receiptDocumentId);
+
         public async Task<List<ReceiptDocument>> GetReceiptDocumentsAsync(DateOnly dateFrom, DateOnly dateUntil,
             List<uint> receiptNumbers, List<Guid> resourceIds, List<Guid> measurementUnitIds)
         {
@@ -36,6 +40,11 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
             return await receiptDocuments.Include(x => x.ReceiptResources).ToListAsync();
         }
 
+        public async Task<List<uint>> GetReceiptDocumentNumbersAsync()
+        {
+            return await context.ReceiptDocuments.Select(x => x.ReceiptNumber).ToListAsync();
+        }
+
         public async Task AddAsync(ReceiptDocument model)
         {
             await context.ReceiptDocuments.AddAsync(model);
@@ -44,9 +53,12 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
 
         public async Task DeleteAsync(Guid receiptDocumentId)
         {
-            var receiptDocument = await context.ReceiptDocuments.SingleAsync(x => x.Id == receiptDocumentId);
-            context.ReceiptDocuments.Remove(receiptDocument);
-            await context.SaveChangesAsync();
+            var receiptDocument = await context.ReceiptDocuments.SingleOrDefaultAsync(x => x.Id == receiptDocumentId);
+            if (receiptDocument != null)
+            {
+                context.ReceiptDocuments.Remove(receiptDocument);
+                await context.SaveChangesAsync();
+            }
         }
 
         public async Task UpdateAsync(ReceiptDocument model)

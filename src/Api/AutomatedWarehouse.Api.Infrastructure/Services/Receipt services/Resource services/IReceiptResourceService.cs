@@ -4,7 +4,6 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Resour
 {
     public interface IReceiptResourceService
     {
-        Task<List<ReceiptResource>> GetByReceiptDocumentIdAsync(Guid receiptDocumentId);
         Task UpdateReceiptDocumentResourcesAsync(List<ReceiptResource> receiptResources, Guid receiptDocumentId);
     }
 }
