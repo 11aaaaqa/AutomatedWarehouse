@@ -4,6 +4,7 @@ using AutomatedWarehouse.Api.DTOs.Receipt;
 using AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Document_services;
 using AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Resource_services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutomatedWarehouse.Api.Controllers
 {
@@ -25,7 +26,7 @@ namespace AutomatedWarehouse.Api.Controllers
                 });
                 await receiptResourceService.UpdateReceiptDocumentResourcesAsync(model.ReceiptResources, model.ReceiptDocumentId);
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Receipt document with current receipt number already exists");
             }
@@ -49,7 +50,7 @@ namespace AutomatedWarehouse.Api.Controllers
                 await receiptResourceService.UpdateReceiptDocumentResourcesAsync(model.ReceiptResources,
                     model.ReceiptDocumentId);
             }
-            catch (InvalidOperationException)
+            catch (DbUpdateException)
             {
                 return Conflict("Receipt document with current receipt number already exists");
             }
