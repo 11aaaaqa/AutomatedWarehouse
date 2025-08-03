@@ -7,5 +7,8 @@
         public Guid MeasurementUnitId { get; set; }
         public uint Quantity { get; set; }
         public Guid ReceiptDocumentId { get; set; }
+
+        public Resource? Resource { get; set; }
+        public MeasurementUnit? MeasurementUnit { get; set; }
     }
 }
