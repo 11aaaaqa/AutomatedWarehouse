@@ -64,6 +64,7 @@
         const resourceInput = document.createElement('input');
         resourceInput.type = 'text';
         resourceInput.value = availableResources[0].Name;
+        resourceInput.dataset.value = availableResources[0].Id;
         resourceInput.readOnly = true;
         resourceInput.className = 'receipt-table-input';
         resourceInput.addEventListener('click', function() {
@@ -79,6 +80,7 @@
         const unitInput = document.createElement('input');
         unitInput.type = 'text';
         unitInput.value = availableMeasurementUnits[0].Name;
+        unitInput.dataset.value = availableMeasurementUnits[0].Id;
         unitInput.readOnly = true;
         unitInput.className = 'receipt-table-input';
         unitInput.addEventListener('click', function() {
@@ -93,7 +95,6 @@
         const td4 = document.createElement('td');
         const quantityInput = document.createElement('input');
         quantityInput.type = 'number';
-        // quantityInput.min = '1';
         quantityInput.value = '0';
         quantityInput.className = 'receipt-table-input';
         td4.appendChild(quantityInput);
@@ -169,13 +170,13 @@
         if (!succeeded)
             return;
         const date = document.getElementById('receipt-date-input').value;
-        const number = parseInt(document.getElementById('receipt-document-number-input').value);
+        const number = document.getElementById('receipt-document-number-input').value.trim();
 
         if (date === null) {
             showErrorMessage('Не указана дата');
             return;
         }
-        if (number === null) {
+        if (number === "") {
             showErrorMessage('Не указан номер');
             return;
         }
