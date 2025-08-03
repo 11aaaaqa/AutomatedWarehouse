@@ -37,7 +37,12 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
                     y => measurementUnitIds.Contains(y.MeasurementUnitId))).AsQueryable();
             }
 
-            return await receiptDocuments.Include(x => x.ReceiptResources).ToListAsync();
+            return await receiptDocuments
+                .Include(x => x.ReceiptResources)
+                .ThenInclude(x => x.MeasurementUnit)
+                .Include(x => x.ReceiptResources)
+                .ThenInclude(x => x.Resource)
+                .ToListAsync();
         }
 
         public async Task<List<uint>> GetReceiptDocumentNumbersAsync()
