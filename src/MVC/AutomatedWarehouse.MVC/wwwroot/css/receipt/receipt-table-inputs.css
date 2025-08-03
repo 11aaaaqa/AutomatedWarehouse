@@ -1,0 +1,12 @@
+﻿.receipt-table-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+.receipt-table-input:focus {
+    border-color: lightblue;
+    outline: 2px solid lightblue;
+}
