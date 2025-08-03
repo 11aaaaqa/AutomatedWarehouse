@@ -1,4 +1,5 @@
-﻿using AutomatedWarehouse.Api.Domain.Models;
+﻿using AutomatedWarehouse.Api.Domain.Exceptions;
+using AutomatedWarehouse.Api.Domain.Models;
 using AutomatedWarehouse.Api.DTOs.Resource;
 using AutomatedWarehouse.Api.Infrastructure.Services.Guide_services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +29,9 @@ namespace AutomatedWarehouse.Api.Controllers
             {
                 await resourceService.DeleteAsync(resourceId);
             }
-            catch (DbUpdateException)
+            catch (EntityIsInUsageException ex)
             {
-                return Conflict("Resource cannot be deleted because it is used in another table");
+                return Conflict(ex.Message);
             }
             return Ok();
         }

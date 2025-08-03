@@ -1,4 +1,5 @@
-﻿using AutomatedWarehouse.Api.Domain.Models;
+﻿using AutomatedWarehouse.Api.Domain.Exceptions;
+using AutomatedWarehouse.Api.Domain.Models;
 using AutomatedWarehouse.Api.Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,8 +25,11 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Guide_services
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid entityId) //check
+        public async Task DeleteAsync(Guid entityId)
         {
+            if (context.ReceiptResources.Any(x => x.ResourceId == entityId))
+                throw new EntityIsInUsageException("Cannot delete Resource with current Id because it is currently using in another table");
+
             var resource = await context.Resources.SingleAsync(x => x.Id == entityId);
             context.Resources.Remove(resource);
             await context.SaveChangesAsync();

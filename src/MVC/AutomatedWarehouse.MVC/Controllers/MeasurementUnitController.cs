@@ -80,7 +80,7 @@ namespace AutomatedWarehouse.MVC.Controllers
             var deleteMeasurementUnitResponse = await httpClient.DeleteAsync($"{url}/api/MeasurementUnit/Delete/{measurementUnitId}");
             if (deleteMeasurementUnitResponse.StatusCode == HttpStatusCode.Conflict)
             {
-                return Conflict("Невозможно удалить ресурс, так как он используется");
+                return Conflict("Невозможно удалить единицу измерения, так как она используется");
             }
 
             deleteMeasurementUnitResponse.EnsureSuccessStatusCode();
