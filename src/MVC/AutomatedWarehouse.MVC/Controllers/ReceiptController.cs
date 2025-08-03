@@ -25,11 +25,11 @@ namespace AutomatedWarehouse.MVC.Controllers
         {
             using HttpClient httpClient = httpClientFactory.CreateClient();
 
-            var resourcesResponse = await httpClient.GetAsync($"{url}/api/Resource/GetAll");
+            var resourcesResponse = await httpClient.GetAsync($"{url}/api/Resource/GetAll?isArchived=false");
             resourcesResponse.EnsureSuccessStatusCode();
             var resources = await resourcesResponse.Content.ReadFromJsonAsync<List<ResourceResponseModel>>();
 
-            var measurementUnitsResponse = await httpClient.GetAsync($"{url}/api/MeasurementUnit/GetAll");
+            var measurementUnitsResponse = await httpClient.GetAsync($"{url}/api/MeasurementUnit/GetAll?isArchived=false");
             measurementUnitsResponse.EnsureSuccessStatusCode();
             var measurementUnits = await measurementUnitsResponse.Content.ReadFromJsonAsync<List<MeasurementUnitResponseModel>>();
 
