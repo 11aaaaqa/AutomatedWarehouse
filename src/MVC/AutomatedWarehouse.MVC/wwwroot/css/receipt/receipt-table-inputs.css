@@ -10,3 +10,7 @@
     border-color: lightblue;
     outline: 2px solid lightblue;
 }
+
+.receipt-table-input:hover {
+    cursor: default;
+}
