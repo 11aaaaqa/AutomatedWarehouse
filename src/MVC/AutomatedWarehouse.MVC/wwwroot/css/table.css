@@ -1,13 +1,11 @@
-﻿tr {
+﻿th {
     border: 1px solid black;
-}
-
-th {
     background-color: lightgray;
     padding: 3px;
 }
 
 td {
+    border: 1px solid black;
     padding: 3px;
     overflow-wrap: break-word;
     word-break: break-word;
