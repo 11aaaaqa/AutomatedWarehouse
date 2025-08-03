@@ -11,7 +11,7 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
                 .SingleAsync(x => x.Id == receiptDocumentId);
 
         public async Task<List<ReceiptDocument>> GetReceiptDocumentsAsync(DateOnly dateFrom, DateOnly dateUntil,
-            List<uint> receiptNumbers, List<Guid> resourceIds, List<Guid> measurementUnitIds)
+            List<string> receiptNumbers, List<Guid> resourceIds, List<Guid> measurementUnitIds)
         {
             var receiptDocuments = context.ReceiptDocuments
                 .Where(x => x.ReceiptDate > dateFrom && x.ReceiptDate < dateUntil).AsQueryable();
@@ -45,7 +45,7 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
                 .ToListAsync();
         }
 
-        public async Task<List<uint>> GetReceiptDocumentNumbersAsync()
+        public async Task<List<string>> GetReceiptDocumentNumbersAsync()
         {
             return await context.ReceiptDocuments.Select(x => x.ReceiptNumber).ToListAsync();
         }
