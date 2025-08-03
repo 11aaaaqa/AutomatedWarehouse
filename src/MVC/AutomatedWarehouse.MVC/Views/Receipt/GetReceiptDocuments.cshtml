@@ -1,0 +1,85 @@
+﻿@model List<AutomatedWarehouse.MVC.Response_models.Receipt.ReceiptDocumentResponseModel>
+<link rel="stylesheet" href="~/css/general-styles.css"/>
+<link rel="stylesheet" href="~/css/table.css"/>
+
+<h2 style="margin-bottom: 10px;">Поступления</h2>
+
+<div style="display: flex; margin-bottom: 15px;">
+    <div style="margin-right: 10px;">
+        <label>Период</label><br/>
+        <div>
+            <input class="input" type="date" value="@ViewBag.DateFrom" id="date-from-input"/>
+            -
+            <input class="input" type="date" value="@ViewBag.DateUntil" id="date-until-input" />
+        </div>
+    </div>
+    <div style="margin-right: 10px;">
+        <label>Номер поступления</label><br/>
+        <div></div>
+    </div>
+    <div style="margin-right: 10px;">
+        <label>Ресурс</label><br />
+        <div></div>
+    </div>
+    <div>
+        <label>Единица измерения</label><br />
+        <div></div>
+    </div>
+</div>
+
+<div style="margin-bottom: 15px;">
+    <button class="button blue-button" style="margin-right: 2px;">Применить</button>
+    <a class="button green-button" asp-controller="Receipt" asp-action="AddReceipt">Добавить</a>
+</div>
+
+<table id="receipt-documents-table">
+    <tr>
+        <th>Номер</th>
+        <th>Дата</th>
+        <th>Ресурс</th>
+        <th>Единица измерения</th>
+        <th>Количество</th>
+    </tr>
+    @foreach (var receiptDocument in Model)
+    {
+        <tr>
+            <td>@receiptDocument.ReceiptNumber</td>
+            <td>@receiptDocument.ReceiptDate</td>
+            @if (receiptDocument.ReceiptResources.Count > 0)
+            {
+                <td>
+                    <table>
+                        @foreach (var receiptResource in receiptDocument.ReceiptResources)
+                        {
+                            <tr><td>@receiptResource.Resource.Name</td></tr>
+                        }
+                    </table>
+                </td>
+
+                <td>
+                    <table>
+                        @foreach (var receiptResource in receiptDocument.ReceiptResources)
+                        {
+                            <tr><td>@receiptResource.MeasurementUnit.Name</td></tr>
+                        }
+                    </table>
+                </td>
+
+                <td>
+                    <table>
+                        @foreach (var receiptResource in receiptDocument.ReceiptResources)
+                        {
+                            <tr><td>@receiptResource.Quantity</td></tr>
+                        }
+                    </table>
+                </td>
+            }
+            else
+            {
+                <td></td>
+                <td></td>
+                <td>0</td>
+            }
+        </tr>
+    }
+</table>

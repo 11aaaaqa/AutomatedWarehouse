@@ -1,0 +1,206 @@
+﻿@using System.Text.Json
+@model AutomatedWarehouse.MVC.Models.View_models.AddReceiptDocumentViewModel
+<link rel="stylesheet" href="~/css/general-styles.css"/>
+<link rel="stylesheet" href="~/css/table.css"/>
+<link rel="stylesheet" href="~/css/receipt/receipt-table-inputs.css"/>
+<link rel="stylesheet" href="~/css/receipt/receipt-dropdown.css"/>
+
+<div style="margin-bottom: 35px;">
+    <h2 style="margin-bottom: 15px;">Поступление</h2>
+    <button class="button green-button" id="add-receipt-document-btn">Сохранить</button>
+</div>
+
+<div id="error-block" class="error-block"></div>
+
+<div style="margin-bottom: 30px;">
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <label for="receipt-document-number-input" style="width: 60px;">Номер</label>
+        <input class="input" type="text" id="receipt-document-number-input"/>
+    </div>
+    
+    <div style="display: flex; align-items: center;">
+        <label for="receipt-date-input" style="width: 60px;">Дата</label>
+        <input class="input" type="date" id="receipt-date-input"/>
+    </div>
+</div>
+
+<table id="receipt-resources-table">
+    <tr>
+        <th><button class="button green-button" id="add-receipt-resource-btn">+</button></th>
+        <th>Ресурс</th>
+        <th>Единица измерения</th>
+        <th>Количество</th>
+    </tr>
+</table>
+
+<script src="~/js/show-error-message.js"></script>
+<script>
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    document.getElementById('receipt-date-input').value = formattedDate;
+
+    const availableMeasurementUnits = @Html.Raw(JsonSerializer.Serialize(Model.MeasurementUnits));
+    const availableResources = @Html.Raw(JsonSerializer.Serialize(Model.Resources));
+
+    const table = document.getElementById('receipt-resources-table');
+
+    document.getElementById('add-receipt-resource-btn').addEventListener('click', function() {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.className = 'button red-button';
+        deleteBtn.addEventListener('click', function() {
+            table.removeChild(tr);
+        });
+        td1.appendChild(deleteBtn);
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        const resourceInput = document.createElement('input');
+        resourceInput.type = 'text';
+        resourceInput.value = availableResources[0].Name;
+        resourceInput.readOnly = true;
+        resourceInput.className = 'receipt-table-input';
+        resourceInput.addEventListener('click', function() {
+            showDropdown(resourceInput, availableResources, selectedResource => {
+                resourceInput.value = selectedResource.Name;
+                resourceInput.dataset.value = selectedResource.Id;
+            });
+        });
+        td2.appendChild(resourceInput);
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        const unitInput = document.createElement('input');
+        unitInput.type = 'text';
+        unitInput.value = availableMeasurementUnits[0].Name;
+        unitInput.readOnly = true;
+        unitInput.className = 'receipt-table-input';
+        unitInput.addEventListener('click', function() {
+            showDropdown(unitInput, availableMeasurementUnits, selectedUnit => {
+                unitInput.value = selectedUnit.Name;
+                unitInput.dataset.value = selectedUnit.Id;
+            });
+        });
+        td3.appendChild(unitInput);
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'number';
+        // quantityInput.min = '1';
+        quantityInput.value = '0';
+        quantityInput.className = 'receipt-table-input';
+        td4.appendChild(quantityInput);
+        tr.appendChild(td4);
+
+        table.appendChild(tr);
+    });
+
+    function showDropdown(inputElement, items, onSelect) {
+        const dropdownToRemove = document.getElementById('dropdown');
+        if (dropdownToRemove) {
+            document.body.removeChild(dropdownToRemove);
+        }
+
+        const dropdown = document.createElement('div');
+        dropdown.id = 'dropdown';
+        dropdown.className = 'receipt-dropdown';
+
+        items.forEach(item => {
+            const option = document.createElement('div');
+            option.textContent = item.Name;
+            option.className = 'receipt-dropdown-item';
+            option.addEventListener('click', () => {
+                onSelect(item);
+                document.body.removeChild(dropdown);
+            });
+            dropdown.appendChild(option);
+        });
+
+        document.body.appendChild(dropdown);
+        const rect = inputElement.getBoundingClientRect();
+        dropdown.style.top = rect.bottom + 'px';
+        dropdown.style.left = rect.left + 'px';
+        dropdown.style.width = rect.width + 'px';
+
+        document.addEventListener('click', function handler(e) {
+            if (!dropdown.contains(e.target) && e.target !== inputElement) {
+                if (document.body.contains(dropdown)) {
+                    document.body.removeChild(dropdown);
+                }
+                document.removeEventListener('click', handler);
+            }
+        });
+    }
+
+    const receiptResources = [];
+    function fillReceiptResources() {
+        receiptResources.length = 0;
+        for (let i = 0; i < table.rows.length; i++) {
+            const row = table.rows[i];
+
+            const resourceInput = row.cells[1].querySelector('input');
+            const unitInput = row.cells[2].querySelector('input');
+            const quantityInput = row.cells[3].querySelector('input');
+
+            if (resourceInput && unitInput && quantityInput) {
+                const resourceId = resourceInput.dataset.value;
+                const measurementUnitId = unitInput.dataset.value;
+                const quantity = quantityInput.value;
+                if (quantity < 1) {
+                    showErrorMessage('Неправильно заполнены ресурсы');
+                    return false;
+                }
+
+                receiptResources.push({resourceId, measurementUnitId, quantity});
+            }
+        }
+        return true;
+    }
+
+    document.getElementById('add-receipt-document-btn').addEventListener('click', async function() {
+        const succeeded = fillReceiptResources();
+        if (!succeeded)
+            return;
+        const date = document.getElementById('receipt-date-input').value;
+        const number = parseInt(document.getElementById('receipt-document-number-input').value);
+
+        if (date === null) {
+            showErrorMessage('Не указана дата');
+            return;
+        }
+        if (number === null) {
+            showErrorMessage('Не указан номер');
+            return;
+        }
+
+        const data = {
+            Number: number,
+            Date: date,
+            ReceiptResources: receiptResources
+        };
+        const response = await fetch('/receipts/add',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+        if (response.status === 409) {
+            showErrorMessage(await response.text());
+        }
+        if(response.status === 500) {
+            showErrorMessage('Что-то пошло не так, попробуйте позже');
+        }
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+    });
+</script>
