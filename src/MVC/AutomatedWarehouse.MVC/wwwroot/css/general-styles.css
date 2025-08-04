@@ -11,6 +11,18 @@
     outline: 2px solid lightblue;
 }
 
+.full-input {
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+.full-input:focus {
+    border-color: lightblue;
+    outline: 2px solid lightblue;
+}
+
 .button {
     text-decoration: none;
     border: none;
