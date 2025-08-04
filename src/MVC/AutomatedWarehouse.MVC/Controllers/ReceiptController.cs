@@ -74,14 +74,12 @@ namespace AutomatedWarehouse.MVC.Controllers
 
         [Route("receipts")]
         [HttpGet]
-        public async Task<IActionResult> GetReceiptDocuments(DateOnly? dateFrom, DateOnly? dateUntil)
+        public async Task<IActionResult> GetReceiptDocuments()
         {
-            if(dateFrom == null)
-                dateFrom = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-7);
-            if (dateUntil == null)
-                dateUntil = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(7);
-            ViewBag.DateUntil = dateUntil;
-            ViewBag.DateFrom = dateFrom;
+            DateOnly dateFrom = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-7);
+            DateOnly dateUntil = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(7);
+            ViewBag.DateUntil = dateUntil.ToString("yyyy-MM-dd");
+            ViewBag.DateFrom = dateFrom.ToString("yyyy-MM-dd");
 
             using HttpClient httpClient = httpClientFactory.CreateClient();
             using StringContent jsonContent = new(JsonSerializer.Serialize(new {DateFrom = dateFrom, DateUntil = dateUntil}),
