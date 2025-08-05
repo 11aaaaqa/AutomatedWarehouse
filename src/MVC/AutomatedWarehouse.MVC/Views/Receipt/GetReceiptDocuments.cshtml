@@ -18,7 +18,7 @@
         <label>Номер поступления</label><br />
         <div id="receipt-numbers-open-modal-btn" class="open-filter-modal-div">
             <div id="selected-receipt-numbers-block" class="selected-receipt-numbers-div">Выберите</div>
-            <div class="dropdown-sign">▼</div>
+            <div id="receipt-numbers-dropdown-block" class="dropdown-sign">▼</div>
         </div>
         <div id="receipt-numbers-modal" class="filter-modal-block">
             @foreach (var receiptNumber in Model.ReceiptNumbers)
@@ -37,7 +37,7 @@
         <label>Ресурс</label><br />
         <div id="resources-open-modal-btn" class="open-filter-modal-div">
             <div id="selected-resources-block" class="selected-receipt-numbers-div">Выберите</div>
-            <div class="dropdown-sign">▼</div>
+            <div id="resources-dropdown-block" class="dropdown-sign">▼</div>
         </div>
         <div id="resources-modal" class="filter-modal-block">
             @foreach (var resource in Model.AvailableResources)
@@ -56,7 +56,7 @@
         <label>Единица измерения</label><br />
         <div id="units-open-modal-btn" class="open-filter-modal-div">
             <div id="selected-units-block" class="selected-receipt-numbers-div">Выберите</div>
-            <div class="dropdown-sign">▼</div>
+            <div id="units-dropdown-block" class="dropdown-sign">▼</div>
         </div>
         <div id="units-modal" class="filter-modal-block">
             @foreach (var unit in Model.AvailableMeasurementUnits)
@@ -138,7 +138,8 @@
     }
 
     function handleClickOutsideNumberModal(event) {
-        if (!receiptNumbersModal.contains(event.target) && event.target !== receiptNumberOpenModalBtn) {
+        if (!receiptNumbersModal.contains(event.target) && !selectedReceiptNumbersBlock.contains(event.target)
+            && !document.getElementById('receipt-numbers-dropdown-block').contains(event.target) && event.target !== receiptNumberOpenModalBtn) {
             receiptNumbersModal.style.display = 'none';
         }
     }
@@ -206,7 +207,8 @@
     }
 
     function handleClickOutsideResourcesModal(event) {
-        if (!resourcesModal.contains(event.target) && event.target !== resourcesOpenModalBtn) {
+        if (!resourcesModal.contains(event.target) && !selectedResourcesBlock.contains(event.target)
+            && !document.getElementById('resources-dropdown-block').contains(event.target) && event.target !== resourcesOpenModalBtn) {
             resourcesModal.style.display = 'none';
         }
     }
@@ -275,7 +277,8 @@
     }
     
     function handleClickOutsideUnitModal(event) {
-        if (!unitsModal.contains(event.target) && event.target !== unitsOpenModalBtn) {
+        if (!unitsModal.contains(event.target) && !selectedUnitsBlock.contains(event.target)
+            && !document.getElementById('units-dropdown-block').contains(event.target) && event.target !== unitsOpenModalBtn) {
             unitsModal.style.display = 'none';
         }
     }
