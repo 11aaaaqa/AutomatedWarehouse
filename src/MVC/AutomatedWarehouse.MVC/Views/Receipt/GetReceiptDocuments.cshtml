@@ -294,11 +294,14 @@
         infoWaitingDataBlock.textContent = 'Загрузка данных';
         document.body.appendChild(infoWaitingDataBlock);
 
+        const dateFrom = document.getElementById('date-from-input').value;
+        const dateUntil = document.getElementById('date-until-input').value;
         const selectedReceiptNumbers = Array.from(receiptNumbersSelect.selectedOptions).map(option => option.value);
         const selectedResourceIds= Array.from(resourcesSelect.selectedOptions).map(option => option.value);
         const selectedUnitIds = Array.from(unitsSelect.selectedOptions).map(option => option.value);
         const data = {
-            ReceiptNumbers: selectedReceiptNumbers, ResourceIds: selectedResourceIds, MeasurementUnitIds: selectedUnitIds
+            DateFrom : dateFrom, DateUntil: dateUntil, ReceiptNumbers: selectedReceiptNumbers,
+            ResourceIds: selectedResourceIds, MeasurementUnitIds: selectedUnitIds
         };
 
         const response = await fetch('receipts/filter/get-json',
