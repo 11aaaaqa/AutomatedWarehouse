@@ -137,12 +137,20 @@
         receiptNumbersModal.style.width = rect.width + 'px';
     }
 
+    function handleClickOutsideNumberModal(event) {
+        if (!receiptNumbersModal.contains(event.target) && event.target !== receiptNumberOpenModalBtn) {
+            receiptNumbersModal.style.display = 'none';
+        }
+    }
+
     receiptNumberOpenModalBtn.addEventListener('click', function() {
         if (receiptNumbersModal.style.display === 'none' || receiptNumbersModal.style.display === '') {
             receiptNumbersModal.style.display = 'block';
             calculateNumbersModalRect();
+            document.addEventListener('click', handleClickOutsideNumberModal);
         } else {
             receiptNumbersModal.style.display = 'none';
+            document.removeEventListener('click', handleClickOutsideNumberModal);
         }
     });
 
@@ -197,12 +205,20 @@
         resourcesModal.style.width = rect.width + 'px';
     }
 
+    function handleClickOutsideResourcesModal(event) {
+        if (!resourcesModal.contains(event.target) && event.target !== resourcesOpenModalBtn) {
+            resourcesModal.style.display = 'none';
+        }
+    }
+
     resourcesOpenModalBtn.addEventListener('click', function() {
         if (resourcesModal.style.display === 'none' || resourcesModal.style.display === '') {
             resourcesModal.style.display = 'block';
             calculateResourcesModalRect();
+            document.addEventListener('click', handleClickOutsideResourcesModal);
         } else {
             resourcesModal.style.display = 'none';
+            document.removeEventListener('click', handleClickOutsideResourcesModal);
         }
     });
 
@@ -257,13 +273,21 @@
         unitsModal.style.left = rect.left + 'px';
         unitsModal.style.width = rect.width + 'px';
     }
+    
+    function handleClickOutsideUnitModal(event) {
+        if (!unitsModal.contains(event.target) && event.target !== unitsOpenModalBtn) {
+            unitsModal.style.display = 'none';
+        }
+    }
 
     unitsOpenModalBtn.addEventListener('click', function() {
         if (unitsModal.style.display === 'none' || unitsModal.style.display === '') {
             unitsModal.style.display = 'block';
             calculateUnitsModalRect();
+            document.addEventListener('click', handleClickOutsideUnitModal);
         } else {
             unitsModal.style.display = 'none';
+            document.removeEventListener('click', handleClickOutsideUnitModal);
         }
     });
 
