@@ -72,8 +72,8 @@ namespace AutomatedWarehouse.MVC.Controllers
             return RedirectToAction("GetReceiptDocuments");
         }
 
-        [Route("receipts")]
         [HttpGet]
+        [Route("receipts")]
         public async Task<IActionResult> GetReceiptDocuments()
         {
             DateOnly dateFrom = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-7);
@@ -89,7 +89,38 @@ namespace AutomatedWarehouse.MVC.Controllers
             receiptDocumentsResponse.EnsureSuccessStatusCode();
             var receiptDocuments = await receiptDocumentsResponse.Content.ReadFromJsonAsync<List<ReceiptDocumentResponseModel>>();
 
-            return View(receiptDocuments);
+            var receiptNumbersResponse = await httpClient.GetAsync($"{url}/api/ReceiptDocument/GetReceiptDocumentNumbers");
+            receiptNumbersResponse.EnsureSuccessStatusCode();
+            List<string> receiptNumbers = await receiptNumbersResponse.Content.ReadFromJsonAsync<List<string>>();
+
+            var availableMeasurementUnitsResponse = await httpClient.GetAsync($"{url}/api/MeasurementUnit/GetAll?isArchived={false}");
+            availableMeasurementUnitsResponse.EnsureSuccessStatusCode();
+            var availableMeasurementUnits = await availableMeasurementUnitsResponse.Content.ReadFromJsonAsync<List<MeasurementUnitResponseModel>>();
+
+            var availableResourcesResponse = await httpClient.GetAsync($"{url}/api/Resource/GetAll?isArchived={false}");
+            availableResourcesResponse.EnsureSuccessStatusCode();
+            var availableResources = await availableResourcesResponse.Content.ReadFromJsonAsync<List<ResourceResponseModel>>();
+
+            return View(new GetReceiptDocumentsViewModel
+            {
+                AvailableMeasurementUnits = availableMeasurementUnits, AvailableResources = availableResources,
+                ReceiptDocuments = receiptDocuments, ReceiptNumbers = receiptNumbers
+            });
+        }
+
+        [HttpPost]
+        [Route("receipts/filter/get-json")]
+        public async Task<IActionResult> GetFilteredReceiptsJson([FromBody] GetFilteredReceiptsDto model)
+        {
+            using HttpClient httpClient = httpClientFactory.CreateClient();
+            using StringContent jsonContent = new(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+
+            var filteredReceiptsResponse = await httpClient.PostAsync(
+                $"{url}/api/ReceiptDocument/GetFilteredReceiptDocuments", jsonContent);
+            filteredReceiptsResponse.EnsureSuccessStatusCode();
+            var filteredReceipts = await filteredReceiptsResponse.Content.ReadFromJsonAsync<List<ReceiptDocumentResponseModel>>();
+
+            return new JsonResult(filteredReceipts);
         }
     }
 }
