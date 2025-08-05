@@ -78,52 +78,58 @@
     <a class="button green-button" asp-controller="Receipt" asp-action="AddReceipt" style="padding: 9px 10px 10px 10px;">Добавить</a>
 </div>
 
-<table id="receipt-documents-table">
-    <tr>
-        <th>Номер</th>
-        <th>Дата</th>
-        <th>Ресурс</th>
-        <th>Единица измерения</th>
-        <th>Количество</th>
-    </tr>
-    @foreach (var receiptDocument in Model.ReceiptDocuments)
-    {
-        @if (receiptDocument.ReceiptResources.Count == 0)
+<div id="table-block">
+    <table id="receipt-documents-table">
+        <tr>
+            <th>Номер</th>
+            <th>Дата</th>
+            <th>Ресурс</th>
+            <th>Единица измерения</th>
+            <th>Количество</th>
+        </tr>
+        @foreach (var receiptDocument in Model.ReceiptDocuments)
         {
-            <tr>
-                <td>@receiptDocument.ReceiptNumber</td>
-                <td>@receiptDocument.ReceiptDate.ToString("dd.MM.yyyy")</td>
-                <td></td>
-                <td></td>
-                <td>0</td>
-            </tr>
-        }
-        else
-        {
-            @for (int i = 0; i < receiptDocument.ReceiptResources.Count; i++)
+            @if (receiptDocument.ReceiptResources.Count == 0)
             {
-                @if (i == 0)
+                <tr>
+                    <td>@receiptDocument.ReceiptNumber</td>
+                    <td>@receiptDocument.ReceiptDate.ToString("dd.MM.yyyy")</td>
+                    <td></td>
+                    <td></td>
+                    <td>0</td>
+                </tr>
+            }
+            else
+            {
+                @for (int i = 0; i < receiptDocument.ReceiptResources.Count; i++)
                 {
-                    <tr>
-                        <td rowspan="@receiptDocument.ReceiptResources.Count">@receiptDocument.ReceiptNumber</td>
-                        <td rowspan="@receiptDocument.ReceiptResources.Count">@receiptDocument.ReceiptDate.ToString("dd.MM.yyyy")</td>
-                        <td>@receiptDocument.ReceiptResources[i].Resource.Name</td>
-                        <td>@receiptDocument.ReceiptResources[i].MeasurementUnit.Name</td>
-                        <td>@receiptDocument.ReceiptResources[i].Quantity</td>
-                    </tr>
-                }
-                else
-                {
-                    <tr>
-                        <td>@receiptDocument.ReceiptResources[i].Resource.Name</td>
-                        <td>@receiptDocument.ReceiptResources[i].MeasurementUnit.Name</td>
-                        <td>@receiptDocument.ReceiptResources[i].Quantity</td>
-                    </tr>
+                    @if (i == 0)
+                    {
+                        <tr>
+                            <td rowspan="@receiptDocument.ReceiptResources.Count">@receiptDocument.ReceiptNumber</td>
+                            <td rowspan="@receiptDocument.ReceiptResources.Count">@receiptDocument.ReceiptDate.ToString("dd.MM.yyyy")</td>
+                            <td>@receiptDocument.ReceiptResources[i].Resource.Name</td>
+                            <td>@receiptDocument.ReceiptResources[i].MeasurementUnit.Name</td>
+                            <td>@receiptDocument.ReceiptResources[i].Quantity</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@receiptDocument.ReceiptResources[i].Resource.Name</td>
+                            <td>@receiptDocument.ReceiptResources[i].MeasurementUnit.Name</td>
+                            <td>@receiptDocument.ReceiptResources[i].Quantity</td>
+                        </tr>
+                    }
                 }
             }
         }
-    }
-</table>
+    </table>
+</div>
+
+<div id="info-waiting-data-block" style="display: none;">
+    Загрузка данных...
+</div>
 
 <script>
     const receiptNumberOpenModalBtn = document.getElementById('receipt-numbers-open-modal-btn');
@@ -335,18 +341,16 @@
 </script>
 
 <script>
-    const receiptDocumentsTable = document.getElementById('receipt-documents-table');
     const applyFiltersBtn = document.getElementById('apply-filters-btn');
     const receiptNumbersSelect = document.getElementById('receipt-numbers-select');
     const resourcesSelect = document.getElementById('resources-select');
     const unitsSelect = document.getElementById('units-select');
+    const infoWaitingDataBlock = document.getElementById('info-waiting-data-block');
 
     applyFiltersBtn.addEventListener('click', async function() {
-        receiptDocumentsTable.remove();
+        document.getElementById('receipt-documents-table').remove();
 
-        const infoWaitingDataBlock = document.createElement('div');
-        infoWaitingDataBlock.textContent = 'Загрузка данных';
-        document.body.appendChild(infoWaitingDataBlock);
+        infoWaitingDataBlock.style.display = 'block';
 
         const dateFrom = document.getElementById('date-from-input').value;
         const dateUntil = document.getElementById('date-until-input').value;
@@ -369,10 +373,11 @@
 
         const responseData = await response.json();
 
-        fillFilteredDocuments(responseData, infoWaitingDataBlock);
+        fillFilteredDocuments(responseData);
+        infoWaitingDataBlock.style.display = 'none';
     });
 
-    function fillFilteredDocuments(collectionData, infoWaitingBlock) {
+    function fillFilteredDocuments(collectionData) {
         const table = document.createElement('table');
         table.id = 'receipt-documents-table';
 
@@ -386,15 +391,15 @@
         table.appendChild(headerRow);
 
         collectionData.forEach(receiptDocument => {
-            if (receiptDocument.ReceiptResources.length === 0) {
+            if (receiptDocument.receiptResources.length === 0) {
                 const tr = document.createElement('tr');
 
                 const receiptNumberTd = document.createElement('td');
-                receiptNumberTd.innerText = receiptDocument.ReceiptNumber;
+                receiptNumberTd.innerText = receiptDocument.receiptNumber;
                 tr.appendChild(receiptNumberTd);
 
                 const dateTd = document.createElement('td');
-                dateTd.innerText = new Date(receiptDocument.ReceiptDate).toLocaleString();
+                dateTd.innerText = new Date(receiptDocument.receiptDate).toLocaleDateString();
                 tr.appendChild(dateTd);
 
                 const resourceTd = document.createElement('td');
@@ -409,30 +414,30 @@
 
                 table.appendChild(tr);
             } else {
-                for (let i = 0; i < receiptDocument.ReceiptResources.length; i++) {
+                for (let i = 0; i < receiptDocument.receiptResources.length; i++) {
                     if (i === 0) {
                         const tr = document.createElement('tr');
 
                         const receiptNumberTd = document.createElement('td');
-                        receiptNumberTd.innerText = receiptDocument.ReceiptNumber;
-                        receiptNumberTd.rowSpan = receiptDocument.ReceiptResources.length;
+                        receiptNumberTd.innerText = receiptDocument.receiptNumber;
+                        receiptNumberTd.rowSpan = receiptDocument.receiptResources.length;
                         tr.appendChild(receiptNumberTd);
 
                         const receiptDateTd = document.createElement('td');
-                        receiptDateTd.innerText = new Date(receiptDocument.ReceiptDate).toLocaleString();
-                        receiptDateTd.rowSpan = receiptDocument.ReceiptResources.length;
+                        receiptDateTd.innerText = new Date(receiptDocument.receiptDate).toLocaleDateString();
+                        receiptDateTd.rowSpan = receiptDocument.receiptResources.length;
                         tr.appendChild(receiptDateTd);
 
                         const resourceNameTd = document.createElement('td');
-                        resourceNameTd.innerText = receiptDocument.ReceiptResources[i].Resource.Name;
+                        resourceNameTd.innerText = receiptDocument.receiptResources[i].resource.name;
                         tr.appendChild(resourceNameTd);
 
                         const unitNameTd = document.createElement('td');
-                        unitNameTd.innerText = receiptDocument.ReceiptResources[i].MeasurementUnit.Name;
+                        unitNameTd.innerText = receiptDocument.receiptResources[i].measurementUnit.name;
                         tr.appendChild(unitNameTd);
 
                         const quantityTd = document.createElement('td');
-                        quantityTd.innerText = receiptDocument.ReceiptResources[i].Quantity;
+                        quantityTd.innerText = receiptDocument.receiptResources[i].quantity;
                         tr.appendChild(quantityTd);
 
                         table.appendChild(tr);
@@ -440,15 +445,15 @@
                         const tr = document.createElement('tr');
 
                         const resourceNameTd = document.createElement('td');
-                        resourceNameTd.innerText = receiptDocument.ReceiptResources[i].Resource.Name;
+                        resourceNameTd.innerText = receiptDocument.receiptResources[i].resource.name;
                         tr.appendChild(resourceNameTd);
 
                         const unitNameTd = document.createElement('td');
-                        unitNameTd.innerText = receiptDocument.ReceiptResources[i].MeasurementUnit.Name;
+                        unitNameTd.innerText = receiptDocument.receiptResources[i].measurementUnit.name;
                         tr.appendChild(unitNameTd);
 
                         const quantityTd = document.createElement('td');
-                        quantityTd.innerText = receiptDocument.ReceiptResources[i].Quantity;
+                        quantityTd.innerText = receiptDocument.receiptResources[i].quantity;
                         tr.appendChild(quantityTd);
 
                         table.appendChild(tr);
@@ -457,7 +462,6 @@
             }
         });
 
-        infoWaitingBlock.remove();
-        document.body.appendChild(table);
+        document.getElementById('table-block').appendChild(table);
     }
 </script>
