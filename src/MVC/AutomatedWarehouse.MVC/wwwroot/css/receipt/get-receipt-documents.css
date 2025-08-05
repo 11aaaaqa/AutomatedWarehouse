@@ -5,12 +5,12 @@
 
 .filter-container {
     margin-right: 25px;
-    position: relative;
     width: 200px;
 }
 
 .open-filter-modal-div {
     display: flex;
+    position: relative;
     padding: 2px;
     justify-content: space-between;
     border: 1px solid #ccc;
@@ -19,6 +19,8 @@
     width: 100%;
     align-items: center;
     cursor: pointer;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .selected-receipt-numbers-div {
@@ -35,9 +37,6 @@
 .filter-modal-block {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
     max-height: 250px;
     overflow-y: auto;
     border-radius: 6px;

@@ -130,9 +130,17 @@
     const receiptNumbersModal = document.getElementById('receipt-numbers-modal');
     const selectedReceiptNumbersBlock = document.getElementById('selected-receipt-numbers-block');
 
+    function calculateNumbersModalRect() {
+        const rect = receiptNumberOpenModalBtn.getBoundingClientRect();
+        receiptNumbersModal.style.top = rect.bottom + 2 + 'px';
+        receiptNumbersModal.style.left = rect.left + 'px';
+        receiptNumbersModal.style.width = rect.width + 'px';
+    }
+
     receiptNumberOpenModalBtn.addEventListener('click', function() {
         if (receiptNumbersModal.style.display === 'none' || receiptNumbersModal.style.display === '') {
             receiptNumbersModal.style.display = 'block';
+            calculateNumbersModalRect();
         } else {
             receiptNumbersModal.style.display = 'none';
         }
@@ -173,6 +181,7 @@
                 selectedReceiptNumbersBlock.textContent = 'Выберите';
             }
         }
+        calculateNumbersModalRect();
     }
 </script>
 
@@ -181,9 +190,17 @@
     const resourcesModal = document.getElementById('resources-modal');
     const selectedResourcesBlock = document.getElementById('selected-resources-block');
 
+    function calculateResourcesModalRect() {
+        const rect = resourcesOpenModalBtn.getBoundingClientRect();
+        resourcesModal.style.top = rect.bottom + 2 + 'px';
+        resourcesModal.style.left = rect.left + 'px';
+        resourcesModal.style.width = rect.width + 'px';
+    }
+
     resourcesOpenModalBtn.addEventListener('click', function() {
         if (resourcesModal.style.display === 'none' || resourcesModal.style.display === '') {
             resourcesModal.style.display = 'block';
+            calculateResourcesModalRect();
         } else {
             resourcesModal.style.display = 'none';
         }
@@ -225,6 +242,7 @@
                 selectedResourcesBlock.textContent = 'Выберите';
             }
         }
+        calculateResourcesModalRect();
     }
 </script>
 
@@ -233,9 +251,17 @@
     const unitsModal = document.getElementById('units-modal');
     const selectedUnitsBlock = document.getElementById('selected-units-block');
 
+    function calculateUnitsModalRect() {
+        const rect = unitsOpenModalBtn.getBoundingClientRect();
+        unitsModal.style.top = rect.bottom + 2 + 'px';
+        unitsModal.style.left = rect.left + 'px';
+        unitsModal.style.width = rect.width + 'px';
+    }
+
     unitsOpenModalBtn.addEventListener('click', function() {
         if (unitsModal.style.display === 'none' || unitsModal.style.display === '') {
             unitsModal.style.display = 'block';
+            calculateUnitsModalRect();
         } else {
             unitsModal.style.display = 'none';
         }
@@ -277,6 +303,7 @@
                 selectedUnitsBlock.textContent = 'Выберите';
             }
         }
+        calculateUnitsModalRect();
     }
 </script>
 
