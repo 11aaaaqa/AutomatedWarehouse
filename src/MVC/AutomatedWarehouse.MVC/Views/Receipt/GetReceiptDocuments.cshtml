@@ -1,21 +1,21 @@
 ﻿@model AutomatedWarehouse.MVC.Models.View_models.GetReceiptDocumentsViewModel
-<link rel="stylesheet" href="~/css/general-styles.css"/>
-<link rel="stylesheet" href="~/css/table.css"/> 
-<link rel="stylesheet" href="~/css/receipt/get-receipt-documents.css"/>
+<link rel="stylesheet" href="~/css/general-styles.css" />
+<link rel="stylesheet" href="~/css/table.css" />
+<link rel="stylesheet" href="~/css/receipt/get-receipt-documents.css" />
 
 <h2 style="margin-bottom: 10px;">Поступления</h2>
 
 <div class="filters-container">
     <div style="margin-right: 25px;">
-        <label>Период</label><br/>
+        <label>Период</label><br />
         <div>
-            <input class="full-input" type="date" value="@ViewBag.DateFrom" id="date-from-input"/>
+            <input class="full-input" type="date" value="@ViewBag.DateFrom" id="date-from-input" />
             -
             <input class="full-input" type="date" value="@ViewBag.DateUntil" id="date-until-input" />
         </div>
     </div>
     <div class="filter-container">
-        <label>Номер поступления</label><br/>
+        <label>Номер поступления</label><br />
         <div id="receipt-numbers-open-modal-btn" class="open-filter-modal-div">
             <div id="selected-receipt-numbers-block" class="selected-receipt-numbers-div">Выберите</div>
             <div class="dropdown-sign">▼</div>
