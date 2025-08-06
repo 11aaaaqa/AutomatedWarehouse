@@ -9,7 +9,7 @@ namespace AutomatedWarehouse.MVC.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("GetReceiptDocuments","Receipt");
         }
 
         public IActionResult Privacy()
