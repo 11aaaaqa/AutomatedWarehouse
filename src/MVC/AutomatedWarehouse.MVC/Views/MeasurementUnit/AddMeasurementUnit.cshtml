@@ -24,11 +24,11 @@
             if (response.status === 409) {
                 showErrorMessage(await response.text());
             }
-            if(response.status === 500) {
-                showErrorMessage('Что-то пошло не так, попробуйте позже');
-            }
-            if (response.redirected) {
+            else if (response.redirected) {
                 window.location.href = response.url;
+            }
+            else {
+                showErrorMessage('Что-то пошло не так, попробуйте позже');
             }
         } else {
             showErrorMessage('Наименование не может быть пустым');
