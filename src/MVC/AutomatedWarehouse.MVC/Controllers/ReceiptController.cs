@@ -5,7 +5,6 @@ using AutomatedWarehouse.MVC.DTOs;
 using AutomatedWarehouse.MVC.Models.View_models;
 using AutomatedWarehouse.MVC.Response_models.Receipt;
 using AutomatedWarehouse.MVC.Response_models.Resource;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutomatedWarehouse.MVC.Controllers
@@ -178,6 +177,18 @@ namespace AutomatedWarehouse.MVC.Controllers
             }
 
             updateReceiptResponse.EnsureSuccessStatusCode();
+
+            return RedirectToAction("GetReceiptDocuments");
+        }
+
+        [HttpPost]
+        [Route("receipts/{receiptDocumentId}/delete")]
+        public async Task<IActionResult> DeleteReceiptDocument([FromRoute] Guid receiptDocumentId)
+        {
+            using HttpClient httpClient = httpClientFactory.CreateClient();
+
+            var deleteResponse = await httpClient.DeleteAsync($"{url}/api/ReceiptDocument/{receiptDocumentId}");
+            deleteResponse.EnsureSuccessStatusCode();
 
             return RedirectToAction("GetReceiptDocuments");
         }

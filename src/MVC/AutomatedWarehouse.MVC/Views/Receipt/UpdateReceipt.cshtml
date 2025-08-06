@@ -7,7 +7,8 @@
 
 <div style="margin-bottom: 35px;">
     <h2 style="margin-bottom: 15px;">Поступление</h2>
-    <button class="button green-button" id="update-receipt-document-btn">Сохранить</button>
+    <button class="button green-button" id="update-receipt-document-btn" style="margin-right: 3px;">Сохранить</button>
+    <button class="button red-button" id="delete-receipt-document-btn">Удалить</button>
 </div>
 
 <div id="error-block" class="error-block"></div>
@@ -213,11 +214,28 @@
         if (response.status === 409) {
             showErrorMessage(await response.text());
         }
-        if(response.status === 500) {
+        else if (response.redirected) {
+            window.location.href = response.url;
+        }
+        else {
             showErrorMessage('Что-то пошло не так, попробуйте позже');
         }
+    });
+
+    document.getElementById('delete-receipt-document-btn').addEventListener('click', async function() {
+        const receiptDocumentId = document.getElementById('receipt-document-id').value;
+
+        const response = await fetch(`/receipts/${receiptDocumentId}/delete`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
         if (response.redirected) {
             window.location.href = response.url;
+        } else {
+            showErrorMessage('Что-то пошло не так, попробуйте позже');
         }
     });
 </script>
