@@ -31,6 +31,7 @@ applyFiltersBtn.addEventListener('click', async function () {
   const responseData = await response.json();
 
   fillFilteredDocuments(responseData);
+  setUpdateDocumentLinks();
   infoWaitingDataBlock.style.display = 'none';
 });
 
@@ -50,6 +51,8 @@ function fillFilteredDocuments(collectionData) {
   collectionData.forEach(receiptDocument => {
     if (receiptDocument.receiptResources.length === 0) {
       const tr = document.createElement('tr');
+      tr.classList.add('tr-link');
+      tr.setAttribute('receiptDocumentId', receiptDocument.id);
 
       const receiptNumberTd = document.createElement('td');
       receiptNumberTd.innerText = receiptDocument.receiptNumber;
@@ -74,6 +77,8 @@ function fillFilteredDocuments(collectionData) {
       for (let i = 0; i < receiptDocument.receiptResources.length; i++) {
         if (i === 0) {
           const tr = document.createElement('tr');
+          tr.classList.add('tr-link');
+          tr.setAttribute('receiptDocumentId', receiptDocument.id);
 
           const receiptNumberTd = document.createElement('td');
           receiptNumberTd.innerText = receiptDocument.receiptNumber;
@@ -100,6 +105,8 @@ function fillFilteredDocuments(collectionData) {
           table.appendChild(tr);
         } else {
           const tr = document.createElement('tr');
+          tr.classList.add('tr-link');
+          tr.setAttribute('receiptDocumentId', receiptDocument.id);
 
           const resourceNameTd = document.createElement('td');
           resourceNameTd.innerText = receiptDocument.receiptResources[i].resource.name;

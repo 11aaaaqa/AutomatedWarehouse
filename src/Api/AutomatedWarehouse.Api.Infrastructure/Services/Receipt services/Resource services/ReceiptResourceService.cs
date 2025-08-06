@@ -13,10 +13,10 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Resour
                 throw new ReceiptDocumentIdMatchException(
                     "Receipt resources collection cannot contain an entity which ReceiptDocumentId property doesn't match with input receipt document id");
 
-            var oldReceiptDocumentResources = await context.ReceiptResources.Where(
+            var currentReceiptDocumentResources = await context.ReceiptResources.Where(
                 x => x.ReceiptDocumentId == receiptDocumentId).ToListAsync();
 
-            if (oldReceiptDocumentResources.Count == 0)
+            if (currentReceiptDocumentResources.Count == 0)
             {
                 if (receiptResources.Count > 0)
                 {
@@ -26,11 +26,27 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Resour
             }
             else
             {
-                var receiptResourcesToDelete = oldReceiptDocumentResources.Except(receiptResources).ToList();
-                var receiptResourcesToAdd = receiptResources.Except(oldReceiptDocumentResources).ToList();
+                foreach (var receiptResource in receiptResources)
+                {
+                    var currentReceiptResource =
+                        currentReceiptDocumentResources.SingleOrDefault(x => x.Id == receiptResource.Id);
+                    if (currentReceiptResource != null)
+                    {
+                        currentReceiptDocumentResources.Remove(currentReceiptResource);
+                        currentReceiptResource.MeasurementUnitId = receiptResource.MeasurementUnitId;
+                        currentReceiptResource.Quantity = receiptResource.Quantity;
+                        currentReceiptResource.ResourceId = receiptResource.ResourceId;
+                        context.ReceiptResources.Update(currentReceiptResource);
+                    }
+                    else
+                    {
+                        await context.ReceiptResources.AddAsync(receiptResource);
+                    }
+                }
 
-                context.ReceiptResources.RemoveRange(receiptResourcesToDelete);
-                await context.ReceiptResources.AddRangeAsync(receiptResourcesToAdd);
+                if (currentReceiptDocumentResources.Count > 0)
+                    context.ReceiptResources.RemoveRange(currentReceiptDocumentResources);
+
                 await context.SaveChangesAsync();
             }
         }

@@ -7,8 +7,14 @@ namespace AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Docume
     public class ReceiptDocumentService(ApplicationDbContext context) : IReceiptDocumentService
     {
         public async Task<ReceiptDocument> GetByIdAsync(Guid receiptDocumentId)
-            => await context.ReceiptDocuments.Include(x => x.ReceiptResources)
+        {
+            return await context.ReceiptDocuments
+                .Include(x => x.ReceiptResources)
+                .ThenInclude(x => x.MeasurementUnit)
+                .Include(x => x.ReceiptResources)
+                .ThenInclude(x => x.Resource)
                 .SingleAsync(x => x.Id == receiptDocumentId);
+        }
 
         public async Task<List<ReceiptDocument>> GetReceiptDocumentsAsync(DateOnly dateFrom, DateOnly dateUntil,
             List<string> receiptNumbers, List<Guid> resourceIds, List<Guid> measurementUnitIds)

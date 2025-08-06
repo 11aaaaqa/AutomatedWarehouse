@@ -1,4 +1,5 @@
-﻿@model AutomatedWarehouse.MVC.Models.View_models.GetReceiptDocumentsViewModel
+﻿@using System.Text.Json
+@model AutomatedWarehouse.MVC.Models.View_models.GetReceiptDocumentsViewModel
 <link rel="stylesheet" href="~/css/general-styles.css" />
 <link rel="stylesheet" href="~/css/table.css" />
 <link rel="stylesheet" href="~/css/receipt/get-receipt-documents.css" />
@@ -91,7 +92,7 @@
         {
             @if (receiptDocument.ReceiptResources.Count == 0)
             {
-                <tr>
+                <tr class="tr-link" receiptDocumentId=@Html.Raw(JsonSerializer.Serialize(receiptDocument.Id))>
                     <td>@receiptDocument.ReceiptNumber</td>
                     <td>@receiptDocument.ReceiptDate.ToString("dd.MM.yyyy")</td>
                     <td></td>
@@ -105,7 +106,7 @@
                 {
                     @if (i == 0)
                     {
-                        <tr>
+                        <tr class="tr-link" receiptDocumentId=@Html.Raw(JsonSerializer.Serialize(receiptDocument.Id))>
                             <td rowspan="@receiptDocument.ReceiptResources.Count">@receiptDocument.ReceiptNumber</td>
                             <td rowspan="@receiptDocument.ReceiptResources.Count">@receiptDocument.ReceiptDate.ToString("dd.MM.yyyy")</td>
                             <td>@receiptDocument.ReceiptResources[i].Resource.Name</td>
@@ -115,7 +116,7 @@
                     }
                     else
                     {
-                        <tr>
+                        <tr class="tr-link" receiptDocumentId=@Html.Raw(JsonSerializer.Serialize(receiptDocument.Id))>
                             <td>@receiptDocument.ReceiptResources[i].Resource.Name</td>
                             <td>@receiptDocument.ReceiptResources[i].MeasurementUnit.Name</td>
                             <td>@receiptDocument.ReceiptResources[i].Quantity</td>
@@ -131,6 +132,7 @@
     Загрузка данных...
 </div>
 
+<script src="~/js/receipt/get-receipt-documents.js"></script>
 <script src="~/js/receipt/receipt-numbers-modal.js"></script>
 <script src="~/js/receipt/resources-modal.js"></script>
 <script src="~/js/receipt/units-modal.js"></script>

@@ -5,6 +5,7 @@ using AutomatedWarehouse.MVC.DTOs;
 using AutomatedWarehouse.MVC.Models.View_models;
 using AutomatedWarehouse.MVC.Response_models.Receipt;
 using AutomatedWarehouse.MVC.Response_models.Resource;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutomatedWarehouse.MVC.Controllers
@@ -13,10 +14,12 @@ namespace AutomatedWarehouse.MVC.Controllers
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly string url;
-        public ReceiptController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        private readonly ILogger<ReceiptController> logger;
+        public ReceiptController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<ReceiptController> logger)
         {
             this.httpClientFactory = httpClientFactory;
             url = $"{configuration["Api:Url:Scheme"]}://{configuration["Api:Url:Domain"]}";
+            this.logger = logger;
         }
 
         [HttpGet]
@@ -62,9 +65,13 @@ namespace AutomatedWarehouse.MVC.Controllers
 
             var response = await httpClient.PostAsync(
                 $"{url}/api/ReceiptDocument", jsonContent);
-            if (response.StatusCode == HttpStatusCode.Conflict)
+            switch (response.StatusCode)
             {
-                return Conflict("В системе уже зарегистрирована накладная с таким номером");
+                case HttpStatusCode.Conflict:
+                    return Conflict("В системе уже зарегистрирована накладная с таким номером");
+                case HttpStatusCode.BadRequest:
+                    logger.LogCritical("Could not add receipt because Receipt Document ID and Receipt Resources Document IDs were different");
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
             }
 
             response.EnsureSuccessStatusCode();
@@ -121,6 +128,58 @@ namespace AutomatedWarehouse.MVC.Controllers
             var filteredReceipts = await filteredReceiptsResponse.Content.ReadFromJsonAsync<List<ReceiptDocumentResponseModel>>();
 
             return new JsonResult(filteredReceipts);
+        }
+
+        [HttpGet]
+        [Route("receipts/{receiptId}/update")]
+        public async Task<IActionResult> UpdateReceipt(Guid receiptId)
+        {
+            using HttpClient httpClient = httpClientFactory.CreateClient();
+
+            var receiptDocumentResponse = await httpClient.GetAsync($"{url}/api/ReceiptDocument/{receiptId}");
+            receiptDocumentResponse.EnsureSuccessStatusCode();
+            var receiptDocument = await receiptDocumentResponse.Content.ReadFromJsonAsync<ReceiptDocumentResponseModel>();
+
+            var resourcesResponse = await httpClient.GetAsync($"{url}/api/Resource/GetAll?isArchived=false");
+            resourcesResponse.EnsureSuccessStatusCode();
+            var resources = await resourcesResponse.Content.ReadFromJsonAsync<List<ResourceResponseModel>>();
+
+            var measurementUnitsResponse = await httpClient.GetAsync($"{url}/api/MeasurementUnit/GetAll?isArchived=false");
+            measurementUnitsResponse.EnsureSuccessStatusCode();
+            var measurementUnits = await measurementUnitsResponse.Content.ReadFromJsonAsync<List<MeasurementUnitResponseModel>>();
+
+            return View(new UpdateReceiptDocumentViewModel
+            {
+                AvailableMeasurementUnits = measurementUnits, AvailableResources = resources,
+                ReceiptDocument = new UpdateReceiptDto
+                {
+                    ReceiptResources = receiptDocument.ReceiptResources, ReceiptDate = receiptDocument.ReceiptDate,
+                    ReceiptDocumentId = receiptDocument.Id, ReceiptNumber = receiptDocument.ReceiptNumber
+                }
+            });
+        }
+
+        [HttpPost]
+        [Route("receipts/{receiptId}/update")]
+        public async Task<IActionResult> UpdateReceipt([FromBody] UpdateReceiptDto model)
+        {
+            using HttpClient httpClient = httpClientFactory.CreateClient();
+            using StringContent jsonContent = new(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
+
+            var updateReceiptResponse = await httpClient.PutAsync($"{url}/api/ReceiptDocument", jsonContent);
+
+            switch (updateReceiptResponse.StatusCode)
+            {
+                case HttpStatusCode.Conflict:
+                    return Conflict("В системе уже зарегистрирована накладная с таким номером");
+                case HttpStatusCode.BadRequest:
+                    logger.LogCritical("Could not update receipt because Receipt Document ID and Receipt Resources Document IDs were different");
+                    return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            updateReceiptResponse.EnsureSuccessStatusCode();
+
+            return RedirectToAction("GetReceiptDocuments");
         }
     }
 }

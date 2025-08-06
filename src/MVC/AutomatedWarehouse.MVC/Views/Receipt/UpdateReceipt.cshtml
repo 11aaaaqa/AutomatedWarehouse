@@ -1,0 +1,221 @@
+﻿@using System.Text.Json
+@model AutomatedWarehouse.MVC.Models.View_models.UpdateReceiptDocumentViewModel
+<link rel="stylesheet" href="~/css/general-styles.css" />
+<link rel="stylesheet" href="~/css/table.css" />
+<link rel="stylesheet" href="~/css/receipt/receipt-table-inputs.css" />
+<link rel="stylesheet" href="~/css/receipt/receipt-dropdown.css" />
+
+<div style="margin-bottom: 35px;">
+    <h2 style="margin-bottom: 15px;">Поступление</h2>
+    <button class="button green-button" id="update-receipt-document-btn">Сохранить</button>
+</div>
+
+<div id="error-block" class="error-block"></div>
+
+<div style="margin-bottom: 30px;">
+    <input id="receipt-document-id" type="hidden" asp-for="ReceiptDocument.ReceiptDocumentId"/>
+
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <label for="receipt-document-number-input" style="width: 60px;">Номер</label>
+        <input class="input" type="text" id="receipt-document-number-input" asp-for="ReceiptDocument.ReceiptNumber"/>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <label for="receipt-date-input" style="width: 60px;">Дата</label>
+        <input class="input" type="date" id="receipt-date-input" asp-for="ReceiptDocument.ReceiptDate"/>
+    </div>
+</div>
+
+<table id="receipt-resources-table">
+    <tr>
+        <th><button class="button green-button" id="add-receipt-resource-btn">+</button></th>
+        <th>Ресурс</th>
+        <th>Единица измерения</th>
+        <th>Количество</th>
+    </tr>
+    @foreach (var receiptResource in Model.ReceiptDocument.ReceiptResources)
+    {
+        <tr>
+            <td><button class="button red-button" onclick="this.closest('tr').remove();" receiptResourceId=@Html.Raw(receiptResource.Id)>×</button></td>
+            <td><input class="receipt-table-input" type="text" value="@receiptResource.Resource.Name" data-value="@receiptResource.Resource.Id" readonly
+                       onclick="showDropdown(this, availableResources, selectedResource =>{this.value = selectedResource.Name; this.dataset.value = selectedResource.Id;})" />
+            </td>
+            <td><input class="receipt-table-input" type="text" value="@receiptResource.MeasurementUnit.Name" data-value="@receiptResource.MeasurementUnit.Id"
+                       readonly onclick="showDropdown(this, availableMeasurementUnits, selectedUnit =>{this.value = selectedUnit.Name; this.dataset.value = selectedUnit.Id;})" />
+            </td>
+            <td><input class="receipt-table-input" type="number" value="@receiptResource.Quantity"/></td>
+        </tr>
+    }
+</table>
+
+<script src="~/js/show-error-message.js"></script>
+<script>
+    const availableMeasurementUnits = @Html.Raw(JsonSerializer.Serialize(Model.AvailableMeasurementUnits));
+    const availableResources = @Html.Raw(JsonSerializer.Serialize(Model.AvailableResources));
+
+    const table = document.getElementById('receipt-resources-table');
+
+    document.getElementById('add-receipt-resource-btn').addEventListener('click', function() {
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '×';
+        deleteBtn.className = 'button red-button';
+        deleteBtn.setAttribute('receiptResourceId', @Html.Raw(JsonSerializer.Serialize(Guid.NewGuid())));
+        deleteBtn.addEventListener('click', function() {
+            table.removeChild(tr);
+        });
+        td1.appendChild(deleteBtn);
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        const resourceInput = document.createElement('input');
+        resourceInput.type = 'text';
+        resourceInput.value = availableResources[0].Name;
+        resourceInput.dataset.value = availableResources[0].Id;
+        resourceInput.readOnly = true;
+        resourceInput.className = 'receipt-table-input';
+        resourceInput.addEventListener('click', function() {
+            showDropdown(resourceInput, availableResources, selectedResource => {
+                resourceInput.value = selectedResource.Name;
+                resourceInput.dataset.value = selectedResource.Id;
+            });
+        });
+        td2.appendChild(resourceInput);
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        const unitInput = document.createElement('input');
+        unitInput.type = 'text';
+        unitInput.value = availableMeasurementUnits[0].Name;
+        unitInput.dataset.value = availableMeasurementUnits[0].Id;
+        unitInput.readOnly = true;
+        unitInput.className = 'receipt-table-input';
+        unitInput.addEventListener('click', function() {
+            showDropdown(unitInput, availableMeasurementUnits, selectedUnit => {
+                unitInput.value = selectedUnit.Name;
+                unitInput.dataset.value = selectedUnit.Id;
+            });
+        });
+        td3.appendChild(unitInput);
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'number';
+        quantityInput.value = '0';
+        quantityInput.className = 'receipt-table-input';
+        td4.appendChild(quantityInput);
+        tr.appendChild(td4);
+
+        table.appendChild(tr);
+    });
+
+    function showDropdown(inputElement, items, onSelect) {
+        const dropdownToRemove = document.getElementById('dropdown');
+        if (dropdownToRemove) {
+            document.body.removeChild(dropdownToRemove);
+        }
+
+        const dropdown = document.createElement('div');
+        dropdown.id = 'dropdown';
+        dropdown.className = 'receipt-dropdown';
+
+        items.forEach(item => {
+            const option = document.createElement('div');
+            option.textContent = item.Name;
+            option.className = 'receipt-dropdown-item';
+            option.addEventListener('click', () => {
+                onSelect(item);
+                document.body.removeChild(dropdown);
+            });
+            dropdown.appendChild(option);
+        });
+
+        document.body.appendChild(dropdown);
+        const rect = inputElement.getBoundingClientRect();
+        dropdown.style.top = rect.bottom + 'px';
+        dropdown.style.left = rect.left + 'px';
+        dropdown.style.width = rect.width + 'px';
+
+        document.addEventListener('click', function handler(e) {
+            if (!dropdown.contains(e.target) && e.target !== inputElement) {
+                if (document.body.contains(dropdown)) {
+                    document.body.removeChild(dropdown);
+                }
+                document.removeEventListener('click', handler);
+            }
+        });
+    }
+
+    const receiptResources = [];
+    function fillReceiptResources() {
+        receiptResources.length = 0;
+        for (let i = 0; i < table.rows.length; i++) {
+            const row = table.rows[i];
+
+            const removeBtn = row.cells[0].querySelector('button');
+            const resourceInput = row.cells[1].querySelector('input');
+            const unitInput = row.cells[2].querySelector('input');
+            const quantityInput = row.cells[3].querySelector('input');
+
+            if (resourceInput && unitInput && quantityInput) {
+                const id = removeBtn.getAttribute('receiptResourceId');
+                const resourceId = resourceInput.dataset.value;
+                const measurementUnitId = unitInput.dataset.value;
+                const quantity = quantityInput.value;
+                const receiptDocumentId = document.getElementById('receipt-document-id').value;
+                if (quantity < 1) {
+                    showErrorMessage('Неправильно заполнены ресурсы');
+                    return false;
+                }
+
+                receiptResources.push({resourceId, measurementUnitId, quantity, receiptDocumentId, id});
+            }
+        }
+        return true;
+    }
+
+    document.getElementById('update-receipt-document-btn').addEventListener('click', async function() {
+        const succeeded = fillReceiptResources();
+        if (!succeeded)
+            return;
+        const receiptDocumentId = document.getElementById('receipt-document-id').value;
+        const date = document.getElementById('receipt-date-input').value;
+        const number = document.getElementById('receipt-document-number-input').value.trim();
+
+        if (date === null) {
+            showErrorMessage('Не указана дата');
+            return;
+        }
+        if (number === "") {
+            showErrorMessage('Не указан номер');
+            return;
+        }
+
+        const data = {
+            ReceiptDocumentId: receiptDocumentId,
+            ReceiptNumber: number,
+            ReceiptDate: date,
+            ReceiptResources: receiptResources
+        };
+        const response = await fetch(`/receipts/${receiptDocumentId}/update`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+        if (response.status === 409) {
+            showErrorMessage(await response.text());
+        }
+        if(response.status === 500) {
+            showErrorMessage('Что-то пошло не так, попробуйте позже');
+        }
+        if (response.redirected) {
+            window.location.href = response.url;
+        }
+    });
+</script>
