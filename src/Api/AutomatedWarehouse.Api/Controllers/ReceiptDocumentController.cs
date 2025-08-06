@@ -59,6 +59,7 @@ namespace AutomatedWarehouse.Api.Controllers
         }
 
         [HttpDelete]
+        [Route("{receiptDocumentId}")]
         public async Task<IActionResult> DeleteAsync(Guid receiptDocumentId)
         {
             await receiptDocumentService.DeleteAsync(receiptDocumentId);
