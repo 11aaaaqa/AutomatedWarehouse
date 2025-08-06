@@ -2,7 +2,6 @@
 using AutomatedWarehouse.Api.Domain.Models;
 using AutomatedWarehouse.Api.DTOs.Receipt;
 using AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Document_services;
-using AutomatedWarehouse.Api.Infrastructure.Services.Receipt_services.Resource_services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,8 +9,7 @@ namespace AutomatedWarehouse.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReceiptDocumentController(IReceiptDocumentService receiptDocumentService,
-        IReceiptResourceService receiptResourceService) : ControllerBase
+    public class ReceiptDocumentController(IReceiptDocumentService receiptDocumentService) : ControllerBase
     {
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateReceiptDocumentDto model)
@@ -22,9 +20,9 @@ namespace AutomatedWarehouse.Api.Controllers
                 {
                     Id = model.ReceiptDocumentId,
                     ReceiptDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                    ReceiptNumber = model.ReceiptNumber
+                    ReceiptNumber = model.ReceiptNumber,
+                    ReceiptResources = model.ReceiptResources
                 });
-                await receiptResourceService.UpdateReceiptDocumentResourcesAsync(model.ReceiptResources, model.ReceiptDocumentId);
             }
             catch (DbUpdateException)
             {
@@ -32,7 +30,6 @@ namespace AutomatedWarehouse.Api.Controllers
             }
             catch (ReceiptDocumentIdMatchException ex)
             {
-                await receiptDocumentService.DeleteAsync(model.ReceiptDocumentId);
                 return BadRequest(ex.Message);
             }
             return Ok();
@@ -45,10 +42,9 @@ namespace AutomatedWarehouse.Api.Controllers
             {
                 await receiptDocumentService.UpdateAsync(new ReceiptDocument
                 {
-                    Id = model.ReceiptDocumentId, ReceiptDate = model.ReceiptDate, ReceiptNumber = model.ReceiptNumber
+                    Id = model.ReceiptDocumentId, ReceiptDate = model.ReceiptDate,
+                    ReceiptNumber = model.ReceiptNumber, ReceiptResources = model.ReceiptResources
                 });
-                await receiptResourceService.UpdateReceiptDocumentResourcesAsync(model.ReceiptResources,
-                    model.ReceiptDocumentId);
             }
             catch (DbUpdateException)
             {

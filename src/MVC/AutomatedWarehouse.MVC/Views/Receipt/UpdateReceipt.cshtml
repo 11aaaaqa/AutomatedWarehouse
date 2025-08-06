@@ -62,7 +62,6 @@
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '×';
         deleteBtn.className = 'button red-button';
-        deleteBtn.setAttribute('receiptResourceId', @Html.Raw(JsonSerializer.Serialize(Guid.NewGuid())));
         deleteBtn.addEventListener('click', function() {
             table.removeChild(tr);
         });
@@ -170,8 +169,11 @@
                     showErrorMessage('Неправильно заполнены ресурсы');
                     return false;
                 }
-
-                receiptResources.push({resourceId, measurementUnitId, quantity, receiptDocumentId, id});
+                if (id === null) {
+                    receiptResources.push({resourceId, measurementUnitId, quantity, receiptDocumentId});
+                } else {
+                    receiptResources.push({resourceId, measurementUnitId, quantity, receiptDocumentId, id});
+                }
             }
         }
         return true;
